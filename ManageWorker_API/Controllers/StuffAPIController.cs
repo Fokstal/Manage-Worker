@@ -1,4 +1,5 @@
 using ManageWorker_API.Data;
+using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,7 @@ namespace ManageWorker_API.Controllers
     public class StuffAPIController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<IEnumerable<StuffDTO>> GetStuffs()
-        {
-            return Ok(StuffStore.StuffList);
-        }
+        public ActionResult<IEnumerable<StuffDTO>> GetStuffs() => Ok(StuffStore.StuffList);
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -27,6 +25,22 @@ namespace ManageWorker_API.Controllers
             if (stuff is not null) return Ok(stuff);
 
             return NotFound();
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult<StuffDTO> CreateStuff([FromBody]StuffDTO stuff)
+        {
+            if (stuff is null) return BadRequest(stuff);
+            if (stuff.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            stuff.Id = StuffStore.StuffList.OrderByDescending(stuff => stuff.Id).FirstOrDefault().Id + 1;
+
+            StuffStore.StuffList.Add(stuff);
+
+            return Ok(stuff);
         }
     }
 }
