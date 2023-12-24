@@ -18,5 +18,11 @@ namespace ManageWorker_API.Controllers
         {
             return StuffStore.StuffList;
         }
+
+        [HttpGet("{id:int}")]
+        public StuffDTO? GetStuff(int id)
+        {
+            return StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+        }
     }
 }
