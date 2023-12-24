@@ -31,17 +31,24 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StuffDTO> CreateStuff([FromBody]StuffDTO stuff)
+        public ActionResult<StuffDTO> CreateStuff([FromBody]StuffDTO stuffDTO)
         {
             // if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (stuff is null) return BadRequest(stuff);
-            if (stuff.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
+            if (StuffStore.StuffList.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
+            {
+                ModelState.AddModelError("CustomError", "Stuff already Exists!");
 
-            stuff.Id = StuffStore.StuffList.OrderByDescending(stuff => stuff.Id).FirstOrDefault().Id + 1;
+                return BadRequest(ModelState);
+            }
 
-            StuffStore.StuffList.Add(stuff);
+            if (stuffDTO is null) return BadRequest(stuffDTO);
+            if (stuffDTO.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            return CreatedAtRoute("GetStuff", new { id = stuff.Id }, stuff);
+            stuffDTO.Id = StuffStore.StuffList.OrderByDescending(stuff => stuff.Id).FirstOrDefault().Id + 1;
+
+            StuffStore.StuffList.Add(stuffDTO);
+
+            return CreatedAtRoute("GetStuff", new { id = stuffDTO.Id }, stuffDTO);
         }
     }
 }
