@@ -1,5 +1,4 @@
 using ManageWorker_API.Data;
-using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
