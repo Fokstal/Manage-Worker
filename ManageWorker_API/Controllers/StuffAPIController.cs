@@ -33,6 +33,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> CreateStuff([FromBody]StuffDTO stuff)
         {
+            // if (!ModelState.IsValid) return BadRequest(ModelState);
             if (stuff is null) return BadRequest(stuff);
             if (stuff.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
 
