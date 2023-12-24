@@ -31,7 +31,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StuffDTO> CreateStuff([FromBody]StuffDTO stuffDTO)
+        public ActionResult<StuffDTO> CreateStuff([FromBody] StuffDTO stuffDTO)
         {
             // if (!ModelState.IsValid) return BadRequest(ModelState);
             if (StuffStore.StuffList.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
@@ -50,7 +50,7 @@ namespace ManageWorker_API.Controllers
 
             return CreatedAtRoute("GetStuff", new { id = stuffDTO.Id }, stuffDTO);
         }
-    
+
         [HttpDelete("{id:int}", Name = "DeleteStuff")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -61,15 +61,26 @@ namespace ManageWorker_API.Controllers
 
             StuffDTO? stuff = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
 
-            if (stuff is not null)
-            {
-                StuffStore.StuffList.Remove(stuff);
+            if (stuff is null) return NotFound();
 
-                return NoContent();
-            }
+            StuffStore.StuffList.Remove(stuff);
 
+            return NoContent();
+        }
 
-            return NotFound();
+        [HttpPut("{id:int}", Name = "UpdateStuff")]
+        public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
+        {
+            if (stuffDTO is null || id != stuffDTO.Id) return BadRequest();
+
+            StuffDTO? stuffToUpdate = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+
+            if (stuffToUpdate is null) return NotFound();
+
+            stuffToUpdate.Name = stuffDTO.Name;
+            stuffToUpdate.CountWorker = stuffDTO.CountWorker;
+
+            return NoContent();
         }
     }
 }
