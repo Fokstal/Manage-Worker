@@ -10,7 +10,7 @@ namespace ManageWorker_API.Models
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        public string? Avatar { get; set; }
+        public string? AvatarUrl { get; set; }
 
         public int StuffId { get; set; }
 
