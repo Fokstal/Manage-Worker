@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ManageWorker_API.Controllers
 {
-    [Route("api/WorkerAPI")]
+    [Route("api/[controller]")]
     [ApiController]
     public class WorkerAPIController : ControllerBase
     {
