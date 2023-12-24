@@ -50,5 +50,26 @@ namespace ManageWorker_API.Controllers
 
             return CreatedAtRoute("GetStuff", new { id = stuffDTO.Id }, stuffDTO);
         }
+    
+        [HttpDelete("{id:int}", Name = "DeleteStuff")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult DeleteStuff(int id)
+        {
+            if (id <= 0) return BadRequest();
+
+            StuffDTO? stuff = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+
+            if (stuff is not null)
+            {
+                StuffStore.StuffList.Remove(stuff);
+
+                return NoContent();
+            }
+
+
+            return NotFound();
+        }
     }
 }
