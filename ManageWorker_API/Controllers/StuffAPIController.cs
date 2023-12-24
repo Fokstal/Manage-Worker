@@ -44,7 +44,11 @@ namespace ManageWorker_API.Controllers
             if (stuffDTO is null) return BadRequest(stuffDTO);
             if (stuffDTO.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            stuffDTO.Id = StuffStore.StuffList.OrderByDescending(stuff => stuff.Id).FirstOrDefault().Id + 1;
+            stuffDTO.Id = 1;
+
+            StuffDTO? stuffByIdLast = StuffStore.StuffList.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
+
+            if (stuffByIdLast is not null) stuffDTO.Id = stuffByIdLast.Id + 1;
 
             StuffStore.StuffList.Add(stuffDTO);
 

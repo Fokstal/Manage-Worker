@@ -12,7 +12,7 @@ namespace ManageWorker_API.Models.Dto
 
         [Required]
         [MaxLength(20)]
-        public string Name { get; set; }
+        public string Name { get; set; } = "N/N";
         public int CountWorker { get; set; }
 
         public DateTime CreatedDate { get; set; }
