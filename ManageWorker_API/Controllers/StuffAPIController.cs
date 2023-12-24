@@ -1,28 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ManageWorker_API.Data;
-using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManageWorker_API.Controllers
-{   
+{
     [Route("api/[controller]")]
     [ApiController]
-    public class StuffAPIController
+    public class StuffAPIController : ControllerBase
     {
         [HttpGet]
-        public IEnumerable<StuffDTO> GetStuffs()
+        public ActionResult<IEnumerable<StuffDTO>> GetStuffs()
         {
-            return StuffStore.StuffList;
+            return Ok(StuffStore.StuffList);
         }
 
         [HttpGet("{id:int}")]
-        public StuffDTO? GetStuff(int id)
+        public ActionResult<StuffDTO> GetStuff(int id)
         {
-            return StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+            if (id <= 0) return BadRequest();
+
+            StuffDTO? stuff = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+
+            if (stuff is not null) return Ok(stuff);
+
+            return NotFound();
         }
     }
 }
