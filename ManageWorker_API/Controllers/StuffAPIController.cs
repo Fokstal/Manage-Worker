@@ -12,7 +12,7 @@ namespace ManageWorker_API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<StuffDTO>> GetStuffs() => Ok(StuffStore.StuffList);
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = "GetStuff")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -28,7 +28,7 @@ namespace ManageWorker_API.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> CreateStuff([FromBody]StuffDTO stuff)
@@ -40,7 +40,7 @@ namespace ManageWorker_API.Controllers
 
             StuffStore.StuffList.Add(stuff);
 
-            return Ok(stuff);
+            return CreatedAtRoute("GetStuff", new { id = stuff.Id }, stuff);
         }
     }
 }
