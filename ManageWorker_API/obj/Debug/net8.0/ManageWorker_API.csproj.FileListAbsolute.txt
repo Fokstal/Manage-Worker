@@ -31,3 +31,8 @@
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/obj/Debug/net8.0/ManageWorker_API.pdb
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/obj/Debug/net8.0/ManageWorker_API.genruntimeconfig.cache
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/obj/Debug/net8.0/ref/ManageWorker_API.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/web.config
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/appsettings.Development.json
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/appsettings.json
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/ManageWorker_API.deps.json
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/ManageWorker_API.runtimeconfig.json
