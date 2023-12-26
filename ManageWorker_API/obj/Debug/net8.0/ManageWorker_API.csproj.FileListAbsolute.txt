@@ -36,3 +36,11 @@
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/appsettings.json
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/ManageWorker_API.deps.json
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/published/ManageWorker_API.runtimeconfig.json
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.IdentityModel.Logging.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll

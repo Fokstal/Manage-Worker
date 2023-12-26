@@ -1,11 +1,13 @@
 using ManageWorker_API.Data;
 using ManageWorker_API.Models.Dto;
+using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManageWorker_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AuthorizeExpiry]
     public class StuffAPIController : ControllerBase
     {
         [HttpGet]
@@ -72,6 +74,9 @@ namespace ManageWorker_API.Controllers
         }
 
         [HttpPut("{id:int}", Name = "UpdateStuff")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
         {
             if (stuffDTO is null || id != stuffDTO.Id) return BadRequest();
