@@ -7,21 +7,29 @@ namespace ManageWorker_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AuthorizeExpiry]
+    // [AuthorizeExpiry]
     public class StuffAPIController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<IEnumerable<StuffDTO>> GetStuffs() => Ok(StuffStore.StuffList);
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult<IEnumerable<StuffDTO>> GetStuffs()
+        {
+            AppDbContext db = new();
+
+            return Ok(db.Stuff);
+        }
 
         [HttpGet("{id:int}", Name = "GetStuff")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<StuffDTO> GetStuff(int id)
         {
             if (id <= 0) return BadRequest();
 
-            StuffDTO? stuff = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+            StuffDTO? stuff = new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
             if (stuff is not null) return Ok(stuff);
 
@@ -31,11 +39,12 @@ namespace ManageWorker_API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> CreateStuff([FromBody] StuffDTO stuffDTO)
         {
             // if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (StuffStore.StuffList.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
+            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
             {
                 ModelState.AddModelError("CustomError", "Stuff already Exists!");
 
@@ -47,11 +56,16 @@ namespace ManageWorker_API.Controllers
 
             stuffDTO.Id = 1;
 
-            StuffDTO? stuffByIdLast = StuffStore.StuffList.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
+            using (AppDbContext db = new())
+            {
+                StuffDTO? stuffByIdLast = db.Stuff.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
 
-            if (stuffByIdLast is not null) stuffDTO.Id = stuffByIdLast.Id + 1;
+                if (stuffByIdLast is not null) stuffDTO.Id = stuffByIdLast.Id + 1;
 
-            StuffStore.StuffList.Add(stuffDTO);
+                db.Stuff.Add(stuffDTO);
+
+                db.SaveChanges();
+            }
 
             return CreatedAtRoute("GetStuff", new { id = stuffDTO.Id }, stuffDTO);
         }
@@ -59,16 +73,22 @@ namespace ManageWorker_API.Controllers
         [HttpDelete("{id:int}", Name = "DeleteStuff")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteStuff(int id)
         {
             if (id <= 0) return BadRequest();
 
-            StuffDTO? stuff = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+            using (AppDbContext db = new())
+            {
+                StuffDTO? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
-            if (stuff is null) return NotFound();
+                if (stuff is null) return NotFound();
 
-            StuffStore.StuffList.Remove(stuff);
+                db.Stuff.Remove(stuff);
+
+                db.SaveChanges();
+            }
 
             return NoContent();
         }
@@ -76,17 +96,22 @@ namespace ManageWorker_API.Controllers
         [HttpPut("{id:int}", Name = "UpdateStuff")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
         {
             if (stuffDTO is null || id != stuffDTO.Id) return BadRequest();
 
-            StuffDTO? stuffToUpdate = StuffStore.StuffList.FirstOrDefault(stuff => stuff.Id == id);
+            using (AppDbContext db = new())
+            {
+                StuffDTO? stuffToUpdate = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
-            if (stuffToUpdate is null) return NotFound();
+                if (stuffToUpdate is null) return NotFound();
 
-            stuffToUpdate.Name = stuffDTO.Name;
-            stuffToUpdate.CountWorker = stuffDTO.CountWorker;
+                stuffToUpdate.Name = stuffDTO.Name;
+
+                db.SaveChanges();
+            }
 
             return NoContent();
         }
