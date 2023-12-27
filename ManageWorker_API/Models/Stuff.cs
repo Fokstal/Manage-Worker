@@ -1,22 +1,20 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ManageWorker_API.Models
 {
     public class Stuff
     {
         public int Id { get; set; }
-        
-        [Required]
-        [MaxLength(20)]
-        public string Name { get; set; } = "N/N";
+
+        public string Name { get; set; } = null!;
 
         public int CountWorker
         {
-            get 
+            get
             {
                 return WorkerList.Count;
             }
         }
         public List<Worker> WorkerList { get; set; } = [];
+
+        public DateTime CreatedDate { get; set; }
     }
 }

@@ -23,23 +23,16 @@ namespace ManageWorker_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Stuff");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Stuff");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("ManageWorker_API.Models.Worker", b =>
@@ -62,16 +55,6 @@ namespace ManageWorker_API.Migrations
                     b.HasIndex("StuffId");
 
                     b.ToTable("Worker");
-                });
-
-            modelBuilder.Entity("ManageWorker_API.Models.Dto.StuffDTO", b =>
-                {
-                    b.HasBaseType("ManageWorker_API.Models.Stuff");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasDiscriminator().HasValue("StuffDTO");
                 });
 
             modelBuilder.Entity("ManageWorker_API.Models.Worker", b =>

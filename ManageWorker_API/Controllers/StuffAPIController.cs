@@ -1,4 +1,5 @@
 using ManageWorker_API.Data;
+using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -29,9 +30,19 @@ namespace ManageWorker_API.Controllers
         {
             if (id <= 0) return BadRequest();
 
-            StuffDTO? stuff = new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Id == id);
+            Stuff? stuff = new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
-            if (stuff is not null) return Ok(stuff);
+            if (stuff is not null)
+            {
+                StuffDTO stuffDTO = new()
+                {
+                    Id = stuff.Id,
+                    Name = stuff.Name,
+                };
+
+                return Ok(stuff);
+            }
+
 
             return NotFound();
         }
@@ -58,11 +69,16 @@ namespace ManageWorker_API.Controllers
 
             using (AppDbContext db = new())
             {
-                StuffDTO? stuffByIdLast = db.Stuff.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
+                Stuff? stuffByIdLast = db.Stuff.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
 
                 if (stuffByIdLast is not null) stuffDTO.Id = stuffByIdLast.Id + 1;
 
-                db.Stuff.Add(stuffDTO);
+                db.Stuff.Add(new()
+                {
+                    Id = stuffDTO.Id,
+                    Name = stuffDTO.Name,
+                    CreatedDate = DateTime.Now,
+                });
 
                 db.SaveChanges();
             }
@@ -81,7 +97,7 @@ namespace ManageWorker_API.Controllers
 
             using (AppDbContext db = new())
             {
-                StuffDTO? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
+                Stuff? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
                 if (stuff is null) return NotFound();
 
@@ -100,15 +116,21 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
         {
-            if (stuffDTO is null || id != stuffDTO.Id) return BadRequest();
+            if (stuffDTO is null || id != stuffDTO.Id)
+            {
+                ModelState.AddModelError("CustomError", "Id in response and Id in Stuff is not equal!");
+
+                return BadRequest(ModelState);
+            }
 
             using (AppDbContext db = new())
             {
-                StuffDTO? stuffToUpdate = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
+                Stuff? stuffToUpdate = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
                 if (stuffToUpdate is null) return NotFound();
 
                 stuffToUpdate.Name = stuffDTO.Name;
+                stuffToUpdate.CreatedDate = DateTime.Now;
 
                 db.SaveChanges();
             }
