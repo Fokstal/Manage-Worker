@@ -1,5 +1,4 @@
 using ManageWorker_API.Models;
-using ManageWorker_API.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace ManageWorker_API.Data
@@ -7,6 +6,7 @@ namespace ManageWorker_API.Data
     public class AppDbContext : DbContext
     {
         public DbSet<Stuff> Stuff { get; set; }
+        public DbSet<User> User { get; set; }
 
         public AppDbContext()
         {

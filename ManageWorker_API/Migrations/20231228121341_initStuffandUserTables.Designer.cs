@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ManageWorker_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231227085049_initStuffTable")]
-    partial class initStuffTable
+    [Migration("20231228121341_initStuffandUserTables")]
+    partial class initStuffandUserTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,31 @@ namespace ManageWorker_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Stuff");
+                });
+
+            modelBuilder.Entity("ManageWorker_API.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("ManageWorker_API.Models.Worker", b =>
