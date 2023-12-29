@@ -22,14 +22,23 @@ class AuthService {
     return await res.text();
   }
 
-  public login = async () : Promise<any> => {
+  public login = async ({login, email, password} : user) : Promise<any> => {
+    const res = await fetch(`${this.url}/`, {
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json' 
+      },
+      body : JSON.stringify({
+        "login": login,
+        "email": email,
+        "password": password,
+      })
+    });
 
+    if (!res.ok) throw new Error(`Error while login ${res.statusText}`);
+
+    return await res.text();
   }
-
-  public logout = async () : Promise<any> => {
-
-  }
-
 }
 
 export default AuthService;

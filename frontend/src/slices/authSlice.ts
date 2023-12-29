@@ -25,6 +25,21 @@ const register = createAsyncThunk(
   }
 );
 
+const login = createAsyncThunk(
+  'register/',
+  async (user : user, thunkApi) => {
+    const service = new AuthService();
+    service.login(user)
+    .then((token) => {
+      localStorage.setItem('jwt-token', token);
+      return true;
+    })
+    .catch((err) => {
+      throw new Error(err);
+    })
+  }
+);
+
 const AuthSlice = createSlice({
   name : 'auth',
   initialState,
@@ -34,13 +49,15 @@ const AuthSlice = createSlice({
     },
     logout : state => {
       state.isAuth = false;
+      localStorage.removeItem('jwt-token');
     },
   },
   extraReducers : (builder) => {
     builder.addCase(register.fulfilled, state => {state.isAuth = true});
+    builder.addCase(login.fulfilled, state => {state.isAuth = true});
   },
 });
 
-export { AuthSlice, register };
-export const {login, logout} = AuthSlice.actions
+export { AuthSlice, register, login };
+export const {logout} = AuthSlice.actions
 export default AuthSlice.reducer;
