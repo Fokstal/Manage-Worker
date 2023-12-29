@@ -26,7 +26,7 @@ const register = createAsyncThunk(
 );
 
 const login = createAsyncThunk(
-  'register/',
+  'login/',
   async (user : user, thunkApi) => {
     const service = new AuthService();
     service.login(user)
