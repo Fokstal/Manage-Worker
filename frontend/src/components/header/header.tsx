@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../hooks/hooks';
 
 const pages = ['Stuff', 'Workers'];
 const pagesLinks = ['/stuff', '/workers'];
@@ -20,10 +21,15 @@ const pagesLinks = ['/stuff', '/workers'];
 const settings = ['Profile', 'Logout'];
 const settingLinks = ['/profile', '/'];
 
+const auth = ['Login', 'Registration'];
+const authLinks = ['/login', '/registartion'];
+
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  
   const navigate = useNavigate();
+  const isAuth = useAppSelector(state => state.auth.isAuth);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -92,9 +98,28 @@ const Header = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
+              {isAuth 
+              ? pages.map((page, i) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+                  <Typography 
+                  textAlign="center"
+                  component="a" 
+                  href={pagesLinks[i]}
+                  sx={{
+                    textDecoration: 'none',
+                    color: 'inherit'
+                  }}>{page}</Typography>
+                </MenuItem>))
+              : auth.map((authPage, i) => (
+                <MenuItem key={authPage} onClick={handleCloseNavMenu}>
+                  <Typography 
+                  textAlign="center" 
+                  component="a" 
+                  href={authLinks[i]}
+                  sx={{
+                    textDecoration: 'none',
+                    color: 'inherit'
+                  }}>{authPage}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -135,11 +160,53 @@ const Header = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
+              {isAuth 
+                ?
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" /> 
+                  </IconButton>
+                </Tooltip>
+                : 
+                <Box sx={{ display: 'flex'}}>
+                  <Typography
+                    variant="h6"
+                    noWrap
+                    component="a"
+                    href="/login"
+                    sx={{
+                      mr: 2,
+                      display: { xs: 'none', md: 'flex' },
+                      flexGrow: 1,
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      letterSpacing: '.1rem',
+                      color: 'inherit',
+                      textDecoration: 'none',
+                      fontSize: '18px',
+                    }}>
+                    Войти
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    noWrap
+                    component="a"
+                    href="/registation"
+                    sx={{
+                      mr: 2,
+                      display: { xs: 'none', md: 'flex' },
+                      flexGrow: 1,
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      letterSpacing: '.1rem',
+                      color: 'inherit',
+                      textDecoration: 'none',
+                      fontSize: '18px',
+                    }}>
+                    Зарегистрироваться
+                  </Typography>
+                </Box>
+                }
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
