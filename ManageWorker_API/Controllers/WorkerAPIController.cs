@@ -62,12 +62,13 @@ namespace ManageWorker_API.Controllers
         }
 
         [HttpPost(Name = "CreateWorker")]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult CreateWorker([FromBody] WorkerDTO workerDTO)
+        public ActionResult CreateWorker([FromForm] WorkerDTO workerDTO)
         {
             if (workerDTO is null) return BadRequest(workerDTO);
             if (workerDTO.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
@@ -129,6 +130,12 @@ namespace ManageWorker_API.Controllers
         }
 
         [HttpPut("{id:int}", Name = "UpdateWorker")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Consumes("multipart/form-data")]
         public ActionResult UpdateWorker(int id, [FromBody] WorkerDTO workerDTO)
         {
             if (id < 1) return BadRequest();
