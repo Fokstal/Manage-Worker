@@ -16,12 +16,14 @@ namespace ManageWorker_API.Controllers
     public class AccountAPIController : ControllerBase
     {
         private static readonly int timeLifeJWTinSecond = 3600;
+        private static readonly int timeLifeRefreshInDay = 15;
         private static readonly string keyToAddUser = "KeyToAdd99Key";
 
-        [HttpPost("{key}", Name = "SignUp")]
+        [HttpPost("sign-up/{key}", Name = "SignUp")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult SignUp(string key, [FromBody] UserDTO userDTO)
         {
             if (key != keyToAddUser)
@@ -54,17 +56,21 @@ namespace ManageWorker_API.Controllers
 
                 db.User.Add(user);
 
+                // db.RefreshToken.Add(GenerateRefreshToken());
+
                 db.SaveChanges();
             }
 
-            string? jwt = Authentication(userDTO.Login);
+            // string? jwt = GenerateJWTToken(userDTO.Login);
 
-            if (jwt is null) return Unauthorized();
+            // if (jwt is null) return Unauthorized();
 
-            return Ok(jwt);
+            // return Ok(jwt);
+            
+            return Ok();
         }
 
-        [HttpPost(Name = "Login")]
+        [HttpPost("login/", Name = "Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,13 +87,58 @@ namespace ManageWorker_API.Controllers
                 if (passwordHash != user.PasswordHash) return Unauthorized();
             }
 
-            string? jwt = Authentication(userDTO.Login);
+            RefreshToken refreshToken = GenerateRefreshToken();
+            string? jwt = GenerateJWTToken(userDTO.Login);
 
             if (jwt is null) return Unauthorized();
 
-            return Ok(jwt);
+            return Ok(new
+            {
+                access_token = jwt,
+                refresh_token = refreshToken.Value
+            });
         }
 
+        [HttpPost("auth-refresh/{refreshTokenValue}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult AuthByRefreshToken(string? refreshTokenValue)
+        {
+            if (refreshTokenValue is null) return BadRequest();
+
+            using (AppDbContext db = new())
+            {
+                RefreshToken? refreshToken = db.RefreshToken.FirstOrDefault(token => token.Value == refreshTokenValue);
+
+                if (refreshToken is null) return NotFound();
+
+                if (refreshToken.ExpiryTime > DateTime.Now)
+                {
+                    ModelState.AddModelError("Custom Error", "Refresh token expiry time is up!");
+
+                    return Unauthorized(ModelState);
+                }
+
+                User? user = db.User.FirstOrDefault(user => user.Id == refreshToken.Id);
+
+                if (user is null) return NotFound();
+
+                RefreshToken newRefreshToken = GenerateRefreshToken();
+
+                refreshToken = newRefreshToken;
+
+                db.SaveChanges();
+
+                return Ok(new
+                {
+                    access_token = GenerateJWTToken(user.Login),
+                    refresh_token = newRefreshToken,
+                });
+            }
+        }
 
         private static string GenerateSHA512SaltedHash(string password, string salt = "")
         {
@@ -106,7 +157,7 @@ namespace ManageWorker_API.Controllers
             );
         }
 
-        private static string? Authentication(string login)
+        private static string? GenerateJWTToken(string login)
         {
             if (new AppDbContext().User.FirstOrDefault(user => user.Login == login) is null) return null;
 
@@ -123,6 +174,22 @@ namespace ManageWorker_API.Controllers
             string encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             return encodedJwt;
+        }
+
+        private static RefreshToken GenerateRefreshToken()
+        {
+            RefreshToken refreshToken = new();
+
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+            }
+
+            refreshToken.Value = Convert.ToBase64String(randomNumber);
+            refreshToken.ExpiryTime = DateTime.Now.Add(TimeSpan.FromDays(timeLifeRefreshInDay));
+
+            return refreshToken;
         }
     }
 }
