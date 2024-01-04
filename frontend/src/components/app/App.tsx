@@ -6,6 +6,7 @@ import Profile from '../profile/profile';
 import SignUp from '../registrationPage/registration';
 import SignIn from '../loginPage/login';
 import Logout from '../logout/logout';
+import Stuffs from '../stuffsPage/stuffs';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
           <Route path='*' element={<div>Error...</div>}/>
           <Route path='/' element={<div>Main page</div>}/>
           <Route path='/workers' element={<div>Workers</div>}/>
-          <Route path='/stuff' element={<div>Stuff</div>}/>
+          <Route path='/stuff' element={<Stuffs/>}/>
           <Route path='/profile' element={<Profile/>}/>
           <Route path='/registration' element={<SignUp/>}/>
           <Route path='/login' element={<SignIn/>}/>
