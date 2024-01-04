@@ -22,7 +22,7 @@ const settings = ['Profile', 'Logout'];
 const settingLinks = ['/profile', '/'];
 
 const auth = ['Login', 'Registration'];
-const authLinks = ['/login', '/registartion'];
+const authLinks = ['/login', '/registration'];
 
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -191,7 +191,7 @@ const Header = () => {
                     variant="h6"
                     noWrap
                     component="a"
-                    href="/registation"
+                    href="/registration"
                     sx={{
                       mr: 2,
                       display: { xs: 'none', md: 'flex' },
