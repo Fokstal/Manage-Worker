@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hooks/hooks";
 import { logout } from "../../slices/authSlice";
@@ -8,7 +8,10 @@ const Logout = () => {
   const dispatch = useAppDispatch();
 
   dispatch(logout());
-  navigate('/');
+  
+  useEffect(() => {
+    navigate('/');
+  });
   return (
     <></>
   )

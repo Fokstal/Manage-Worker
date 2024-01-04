@@ -9,6 +9,9 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { useAppDispatch } from '../../hooks/hooks';
+import { login } from '../../slices/authSlice';
+import user from '../../types/user';
 
 function Copyright(props: any) {
   return (
@@ -21,13 +24,16 @@ function Copyright(props: any) {
 }
 
 export default function SignIn() {
+  const dispatch = useAppDispatch();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const newUser : user = {
+      login: data.get('login') as string,
+      email: data.get('email') as string,
+      password: data.get('password') as string,
+    };
+    dispatch(login(newUser))
   };
 
   return (
