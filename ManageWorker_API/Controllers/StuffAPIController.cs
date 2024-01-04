@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ManageWorker_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("stuff/")]
     [ApiController]
-    // [AuthorizeExpiry]
+    [AuthorizeExpiry]
     public class StuffAPIController : ControllerBase
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<IEnumerable<StuffDTO>> GetStuffs()
         {
             AppDbContext db = new();
@@ -26,6 +27,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> GetStuff(int id)
         {
             if (id <= 0) return BadRequest();
@@ -43,7 +45,6 @@ namespace ManageWorker_API.Controllers
                 return Ok(stuff);
             }
 
-
             return NotFound();
         }
 
@@ -54,8 +55,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> CreateStuff([FromBody] StuffDTO stuffDTO)
         {
-            // if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
+            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.Equals(stuffDTO.Name, StringComparison.CurrentCultureIgnoreCase)) is not null)
             {
                 ModelState.AddModelError("CustomError", "Stuff already Exists!");
 
@@ -65,17 +65,10 @@ namespace ManageWorker_API.Controllers
             if (stuffDTO is null) return BadRequest(stuffDTO);
             if (stuffDTO.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            stuffDTO.Id = 1;
-
             using (AppDbContext db = new())
             {
-                Stuff? stuffByIdLast = db.Stuff.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
-
-                if (stuffByIdLast is not null) stuffDTO.Id = stuffByIdLast.Id + 1;
-
                 db.Stuff.Add(new()
                 {
-                    Id = stuffDTO.Id,
                     Name = stuffDTO.Name,
                     CreatedDate = DateTime.Now,
                 });
@@ -91,6 +84,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult DeleteStuff(int id)
         {
             if (id <= 0) return BadRequest();
@@ -114,11 +108,14 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
         {
+            if (id < 1) return BadRequest();
+
             if (stuffDTO is null || id != stuffDTO.Id)
             {
-                ModelState.AddModelError("CustomError", "Id in response and Id in Stuff is not equal!");
+                ModelState.AddModelError("CustomError", "Id and Id in model are not equals!");
 
                 return BadRequest(ModelState);
             }

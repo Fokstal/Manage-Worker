@@ -1,12 +1,10 @@
-using ManageWorker_API.Data;
+using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string myCorsName = "CorsPolicy";
-
-// Add services to the container.
 
 builder.Services.AddCors(options => options.AddPolicy(myCorsName,
     builder =>

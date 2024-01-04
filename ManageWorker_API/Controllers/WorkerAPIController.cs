@@ -4,20 +4,15 @@ using ManageWorker_API.Models.Dto;
 using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-// Ctrl + G + {numberStroke} - go to stroke by number
-// Shirt + [ArrUp] / [ArrDown] - copy stroke all
-// Ctrl + Shift + \ - go to {} (skobki in class,)
+using static ManageWorker_API.Service.WorkerAPIService;
 
 namespace ManageWorker_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("worker/")]
     [ApiController]
-    // [AuthorizeExpiry]
+    [AuthorizeExpiry]
     public class WorkerAPIController : ControllerBase
     {   
-        private static readonly string avatarFolderPath = "./AppData/images/avatars/";
-
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -82,7 +77,6 @@ namespace ManageWorker_API.Controllers
 
             using (AppDbContext db = new())
             {
-
                 Stuff? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == workerDTO.StuffId);
 
                 if (stuff is null) return NotFound();
@@ -99,7 +93,7 @@ namespace ManageWorker_API.Controllers
 
                 db.SaveChanges();
 
-                return Created();
+                return CreatedAtRoute("GetWorker", new { id = worker.Id }, worker);
             }
         }
 
@@ -140,47 +134,32 @@ namespace ManageWorker_API.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (id != workerDTO.Id)
+            if (workerDTO is null || id != workerDTO.Id)
             {
                 ModelState.AddModelError("CustomError", "Id and Id in model are not equals!");
+
+                return BadRequest(ModelState);
             }
 
             using (AppDbContext db = new())
             {
-                Worker? worker = db.Worker.FirstOrDefault(worker => worker.Id == id);
+                Worker? workerToUpdate = db.Worker.FirstOrDefault(worker => worker.Id == id);
 
-                if (worker is null) return NotFound();
+                if (workerToUpdate is null) return NotFound();
 
                 Stuff? newStuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == workerDTO.StuffId);
 
                 if (newStuff is null) return NotFound();
 
-                worker.Name = workerDTO.Name;
-                worker.AvatarUrl = UploadAvatarToFolder(workerDTO.Avatar);
-                worker.StuffId = workerDTO.StuffId;
-                worker.Stuff = newStuff;
+                workerToUpdate.Name = workerDTO.Name;
+                workerToUpdate.AvatarUrl = UploadAvatarToFolder(workerDTO.Avatar);
+                workerToUpdate.StuffId = workerDTO.StuffId;
+                workerToUpdate.Stuff = newStuff;
 
                 db.SaveChanges();
             }
 
             return NoContent();
-        }
-
-        private static string UploadAvatarToFolder(IFormFile? avatar)
-        {
-            string avatarUrl = "default.jpg";
-
-            if (avatar is not null)
-            {
-                string avatarGuidName = Guid.NewGuid().ToString();
-                string avatarExtension = Path.GetExtension(avatar.FileName);
-                using FileStream fileStream = new(Path.Combine(avatarFolderPath, avatarGuidName + avatarExtension), FileMode.Create);
-
-                avatar.CopyTo(fileStream);
-
-                avatarUrl = avatarGuidName + avatarExtension;
-            }
-            return avatarUrl;
         }
     }
 }
