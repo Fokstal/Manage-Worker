@@ -19,7 +19,7 @@ const pages = ['Stuff', 'Workers'];
 const pagesLinks = ['/stuff', '/workers'];
 
 const settings = ['Profile', 'Logout'];
-const settingLinks = ['/profile', '/'];
+const settingLinks = ['/profile', '/logout'];
 
 const auth = ['Login', 'Registration'];
 const authLinks = ['/login', '/registration'];
