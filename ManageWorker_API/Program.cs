@@ -7,11 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 string myCorsName = "CorsPolicy";
 
 builder.Services.AddCors(options => options.AddPolicy(myCorsName,
-    builder =>
+    policy =>
     {
-        builder
-        .AllowAnyOrigin()
-        .AllowAnyHeader();
+        policy
+        .WithOrigins("localhost:3000")
+        .WithHeaders("Authorization");
     }));
 
 builder.Services.AddAuthorization();
