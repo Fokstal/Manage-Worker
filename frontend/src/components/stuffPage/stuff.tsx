@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import StuffService from "../../services/stuffService";
 import stuff from "../../types/stuff";
+import { useAppSelector } from "../../hooks/hooks";
 
 const Stuff = () => {
   const {stuffId} = useParams();
   const [item, setItem] = useState<stuff>();
+  const isAuth = useAppSelector(state => state.auth.isAuth);
 
   const updateItem = () => {
     const service = new StuffService();
@@ -48,6 +50,10 @@ const Stuff = () => {
         }}>
         {`Колличество работников - ${item?.countWorker}`}
       </Typography>
+      <Grid sx={{gap: '10px', display: 'flex'}}>
+        {isAuth ? <Button variant="outlined">Change</Button> : null}
+        {isAuth ? <Button variant="outlined" color="error">Delete</Button> : null}
+      </Grid>
     </>
   )
 };
