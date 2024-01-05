@@ -12,6 +12,8 @@ import Container from '@mui/material/Container';
 import { useAppDispatch } from '../../hooks/hooks';
 import { login } from '../../slices/authSlice';
 import user from '../../types/user';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 function Copyright(props: any) {
   return (
@@ -25,6 +27,9 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string>();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -34,7 +39,12 @@ export default function SignIn() {
       password: data.get('password') as string,
     };
     dispatch(login(newUser))
+      .then((res : any) => {
+        if (res.error) setErrorMessage(res.error.message);
+        else navigate('/'); 
+      })
   };
+  
 
   return (
       <Container component="main" maxWidth="xs">
@@ -90,6 +100,7 @@ export default function SignIn() {
             >
               Войти
             </Button>
+            {errorMessage ? <Typography variant='body1' color='error'>{errorMessage}</Typography> : null}
             <Grid container>
               <Grid item xs>
               </Grid>

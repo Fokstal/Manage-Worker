@@ -1,11 +1,11 @@
 import user from "../types/user";
 
 class AuthService {
-  private url = 'http://localhost:5177/AccountAPI';
+  private url = 'http://localhost:5177/account/';
   private key = 'KeyToAdd99Key';
 
-  public register = async ({login, email, password} : user) : Promise<string> => {
-    const res = await fetch(`${this.url}/${this.key}`, {
+  public register = async ({login, email, password} : user) : Promise<any> => {
+    const res = await fetch(`${this.url}sign-up/${this.key}`, {
       method : 'POST',
       headers : {
         'Content-Type' : 'application/json' 
@@ -17,13 +17,13 @@ class AuthService {
       })
     });
 
-    if (!res.ok) throw new Error(`Error while register ${res.statusText}`);
+    if (!res.ok) throw new Error(`Registration error (invalid data or user allready exist)`);
 
-    return await res.text();
+    return await res.json();
   }
 
   public login = async ({login, email, password} : user) : Promise<any> => {
-    const res = await fetch(`${this.url}/`, {
+    const res = await fetch(`${this.url}login`, {
       method : 'POST',
       headers : {
         'Content-Type' : 'application/json' 
@@ -34,10 +34,10 @@ class AuthService {
         "password": password,
       })
     });
+    
+    if (!res.ok) throw new Error(`Login error (check that your password and email are entered correctly)`);
 
-    if (!res.ok) throw new Error(`Error while login ${res.statusText}`);
-
-    return await res.text();
+    return await res.json();
   }
 }
 

@@ -12,6 +12,8 @@ import Container from '@mui/material/Container';
 import { useAppDispatch } from '../../hooks/hooks';
 import { register } from '../../slices/authSlice';
 import user from '../../types/user';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props: any) {
   return (
@@ -25,6 +27,8 @@ function Copyright(props: any) {
 
 export default function SignUp() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,7 +38,11 @@ export default function SignUp() {
       email: data.get('email') as string,
       password: data.get('password') as string,
     };
-    dispatch(register(newUser));
+    dispatch(register(newUser))
+    .then((res : any) => {
+      if (res.error) setErrorMessage(res.error.message);
+      else navigate('/'); 
+    })
   };
 
   return (
@@ -96,6 +104,7 @@ export default function SignUp() {
             >
               Зарегистрироваться
             </Button>
+            {errorMessage ? <Typography variant='body1' color='error'>{errorMessage}</Typography> : null}
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/login" variant="body2">

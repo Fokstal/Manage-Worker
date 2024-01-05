@@ -14,14 +14,17 @@ const register = createAsyncThunk(
   'register/',
   async (user : user, thunkApi) => {
     const service = new AuthService();
-    service.register(user)
-    .then((token) => {
-      localStorage.setItem('jwt-token', token);
-      return true;
-    })
-    .catch((err) => {
-      throw new Error(err);
-    })
+    return service.register(user)
+      .then(() => {
+        return service.login(user);
+      })
+      .then((token) => {
+        localStorage.setItem('jwt-token', token);
+        return true;
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 );
 
@@ -29,14 +32,13 @@ const login = createAsyncThunk(
   'login/',
   async (user : user, thunkApi) => {
     const service = new AuthService();
-    service.login(user)
-    .then((token) => {
-      localStorage.setItem('jwt-token', token);
-      return true;
-    })
-    .catch((err) => {
-      throw new Error(err);
-    })
+    return service.login(user)
+      .then((token) => {
+        localStorage.setItem('jwt-token', token);
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 );
 
@@ -53,8 +55,8 @@ const AuthSlice = createSlice({
     },
   },
   extraReducers : (builder) => {
-    builder.addCase(register.fulfilled, state => {state.isAuth = true});
-    builder.addCase(login.fulfilled, state => {state.isAuth = true});
+    builder.addCase(register.fulfilled, state => {state.isAuth = !!localStorage['jwt-token']});
+    builder.addCase(login.fulfilled, state => {state.isAuth = !!localStorage['jwt-token']});
   },
 });
 
