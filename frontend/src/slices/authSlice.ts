@@ -19,7 +19,7 @@ const register = createAsyncThunk(
         return service.login(user);
       })
       .then((token) => {
-        localStorage.setItem('jwt-token', token);
+        localStorage.setItem('jwt-token', JSON.stringify(token));
         return true;
       })
       .catch((err) => {
@@ -34,7 +34,7 @@ const login = createAsyncThunk(
     const service = new AuthService();
     return service.login(user)
       .then((token) => {
-        localStorage.setItem('jwt-token', token);
+        localStorage.setItem('jwt-token', JSON.stringify(token));
       })
       .catch((err) => {
         throw err;

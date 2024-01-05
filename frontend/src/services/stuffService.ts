@@ -7,7 +7,8 @@ class StuffService {
     const res = await fetch(this.url, {
       method : 'GET',
       headers : {
-        'Content-Type' : 'application/json' 
+        'Content-Type' : 'application/json',
+        'Authorization' : JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
       },
     });
 
@@ -20,7 +21,8 @@ class StuffService {
     const res = await fetch(`${this.url}/${id}`, {
       method : 'GET',
       headers : {
-        'Content-Type' : 'application/json'
+        'Content-Type' : 'application/json',
+        'Authorization' : JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
       }
     });
 
