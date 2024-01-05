@@ -55,7 +55,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<StuffDTO> CreateStuff([FromBody] StuffDTO stuffDTO)
         {
-            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.Equals(stuffDTO.Name, StringComparison.CurrentCultureIgnoreCase)) is not null)
+            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
             {
                 ModelState.AddModelError("CustomError", "Stuff already Exists!");
 

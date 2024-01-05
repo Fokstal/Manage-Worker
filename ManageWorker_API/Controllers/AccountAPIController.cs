@@ -29,7 +29,7 @@ namespace ManageWorker_API.Controllers
             using (AppDbContext db = new())
             {
 
-                if (db.User.FirstOrDefault(user => user.Login.Equals(userDTO.Login, StringComparison.CurrentCultureIgnoreCase)) is not null)
+                if (db.User.FirstOrDefault(user => user.Login.ToLower() == userDTO.Login.ToLower()) is not null)
                 {
                     ModelState.AddModelError("CustomError", "User already Exists!");
 
