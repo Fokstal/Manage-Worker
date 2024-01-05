@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using ManageWorker_API.Data;
 using ManageWorker_API.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ManageWorker_API.Service
@@ -12,9 +13,9 @@ namespace ManageWorker_API.Service
         private static readonly int timeLifeJWTinSecond = 3600;
         private static readonly int timeLifeRefreshInDay = 15;
 
-        public static string? GenerateJWTToken(string login)
+        public static async Task<string?> GenerateJWTTokenAsync(string login)
         {
-            if (new AppDbContext().User.FirstOrDefault(user => user.Login == login) is null) return null;
+            if (await new AppDbContext().User.FirstOrDefaultAsync(user => user.Login == login) is null) return null;
 
             List<Claim> claims = [new(ClaimTypes.Name, login)];
 

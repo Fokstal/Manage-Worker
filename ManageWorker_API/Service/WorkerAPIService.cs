@@ -4,7 +4,7 @@ namespace ManageWorker_API.Service
     {
         public static readonly string avatarFolderPath = "./AppData/images/avatars/";
 
-        public static string UploadAvatarToFolder(IFormFile? avatar)
+        public static async Task<string> UploadAvatarToFolderAsync(IFormFile? avatar)
         {
             string avatarUrl = "default.jpg";
 
@@ -14,7 +14,7 @@ namespace ManageWorker_API.Service
                 string avatarExtension = Path.GetExtension(avatar.FileName);
                 using FileStream fileStream = new(Path.Combine(avatarFolderPath, avatarGuidName + avatarExtension), FileMode.Create);
 
-                avatar.CopyTo(fileStream);
+                await avatar.CopyToAsync(fileStream);
 
                 avatarUrl = avatarGuidName + avatarExtension;
             }

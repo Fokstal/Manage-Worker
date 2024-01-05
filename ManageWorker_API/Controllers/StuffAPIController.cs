@@ -3,6 +3,7 @@ using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManageWorker_API.Controllers
 {
@@ -11,15 +12,15 @@ namespace ManageWorker_API.Controllers
     [AuthorizeExpiry]
     public class StuffAPIController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet(Name = "GetStuffList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<StuffDTO>> GetStuffs()
+        public async Task<ActionResult<IEnumerable<StuffDTO>>> GetStuffListAsync()
         {
             AppDbContext db = new();
 
-            return Ok(db.Stuff);
+            return Ok(await db.Stuff.ToArrayAsync());
         }
 
         [HttpGet("{id:int}", Name = "GetStuff")]
@@ -28,11 +29,11 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StuffDTO> GetStuff(int id)
+        public async Task<ActionResult<StuffDTO>> GetStuffAsync(int id)
         {
             if (id <= 0) return BadRequest();
 
-            Stuff? stuff = new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Id == id);
+            Stuff? stuff = await new AppDbContext().Stuff.FirstOrDefaultAsync(stuff => stuff.Id == id);
 
             if (stuff is not null)
             {
@@ -53,9 +54,9 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StuffDTO> CreateStuff([FromBody] StuffDTO stuffDTO)
+        public async Task<ActionResult<StuffDTO>> CreateStuffAsync([FromBody] StuffDTO stuffDTO)
         {
-            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
+            if (await new AppDbContext().Stuff.FirstOrDefaultAsync(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
             {
                 ModelState.AddModelError("CustomError", "Stuff already Exists!");
 
@@ -73,7 +74,7 @@ namespace ManageWorker_API.Controllers
                     CreatedDate = DateTime.Now,
                 });
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             return CreatedAtRoute("GetStuff", new { id = stuffDTO.Id }, stuffDTO);
@@ -85,19 +86,19 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult DeleteStuff(int id)
+        public async Task<IActionResult> DeleteStuffAsync(int id)
         {
             if (id <= 0) return BadRequest();
 
             using (AppDbContext db = new())
             {
-                Stuff? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
+                Stuff? stuff = await db.Stuff.FirstOrDefaultAsync(stuff => stuff.Id == id);
 
                 if (stuff is null) return NotFound();
 
                 db.Stuff.Remove(stuff);
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             return NoContent();
@@ -109,7 +110,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
+        public async Task<ActionResult<StuffDTO>> UpdateStuffAsync(int id, [FromBody] StuffDTO stuffDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -122,14 +123,14 @@ namespace ManageWorker_API.Controllers
 
             using (AppDbContext db = new())
             {
-                Stuff? stuffToUpdate = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
+                Stuff? stuffToUpdate = await db.Stuff.FirstOrDefaultAsync(stuff => stuff.Id == id);
 
                 if (stuffToUpdate is null) return NotFound();
 
                 stuffToUpdate.Name = stuffDTO.Name;
                 stuffToUpdate.CreatedDate = DateTime.Now;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             return NoContent();

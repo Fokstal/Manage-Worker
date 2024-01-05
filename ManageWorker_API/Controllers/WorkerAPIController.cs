@@ -13,15 +13,15 @@ namespace ManageWorker_API.Controllers
     [AuthorizeExpiry]
     public class WorkerAPIController : ControllerBase
     {   
-        [HttpGet]
+        [HttpGet(Name = "GetWorkerList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<Worker>> GetWorkers()
+        public async Task<ActionResult<IEnumerable<Worker>>> GetWorkerListAsync()
         {
             AppDbContext db = new();
 
-            List<Worker> workerList = [.. db.Worker.Include(worker => worker.Stuff)];
+            List<Worker> workerList = [.. await db.Worker.Include(worker => worker.Stuff).ToArrayAsync()];
 
             workerList.ForEach(worker =>
             {
@@ -39,13 +39,13 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<Worker> GetWorker(int id)
+        public async Task<ActionResult<Worker>> GetWorkerAsync(int id)
         {
             if (id < 1) return BadRequest();
 
             AppDbContext db = new();
 
-            Worker? worker = db.Worker.FirstOrDefault(worker => worker.Id == id);
+            Worker? worker = await db.Worker.FirstOrDefaultAsync(worker => worker.Id == id);
 
             if (worker is null) return NotFound();
 
@@ -63,12 +63,12 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult CreateWorker([FromForm] WorkerDTO workerDTO)
+        public async Task<ActionResult> CreateWorkerAsync([FromForm] WorkerDTO workerDTO)
         {
             if (workerDTO is null) return BadRequest(workerDTO);
             if (workerDTO.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            if (new AppDbContext().Worker.FirstOrDefault(worker => worker.Name == workerDTO.Name && worker.StuffId == workerDTO.StuffId) is not null)
+            if (await new AppDbContext().Worker.FirstOrDefaultAsync(worker => worker.Name == workerDTO.Name && worker.StuffId == workerDTO.StuffId) is not null)
             {
                 ModelState.AddModelError("CustomError", "Worker already exists!");
 
@@ -77,7 +77,7 @@ namespace ManageWorker_API.Controllers
 
             using (AppDbContext db = new())
             {
-                Stuff? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == workerDTO.StuffId);
+                Stuff? stuff = await db.Stuff.FirstOrDefaultAsync(stuff => stuff.Id == workerDTO.StuffId);
 
                 if (stuff is null) return NotFound();
 
@@ -86,12 +86,12 @@ namespace ManageWorker_API.Controllers
                     Name = workerDTO.Name,
                     StuffId = workerDTO.StuffId,
                     Stuff = stuff,
-                    AvatarUrl = UploadAvatarToFolder(workerDTO.Avatar),
+                    AvatarUrl = UploadAvatarToFolderAsync(workerDTO.Avatar),
                 };
 
-                db.Worker.Add(worker);
+                await db.Worker.AddAsync(worker);
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
 
                 return CreatedAtRoute("GetWorker", new { id = worker.Id }, worker);
             }
@@ -103,19 +103,19 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult DeleteWorker(int id)
+        public async Task<ActionResult> DeleteWorkerAsync(int id)
         {
             if (id < 1) return BadRequest();
 
             using (AppDbContext db = new())
             {
-                Worker? worker = db.Worker.FirstOrDefault(worker => worker.Id == id);
+                Worker? worker = await db.Worker.FirstOrDefaultAsync(worker => worker.Id == id);
 
                 if (worker is null) return NotFound();
 
                 db.Worker.Remove(worker);
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
 
                 System.IO.File.Delete(worker.AvatarUrl!);
             }
@@ -130,7 +130,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes("multipart/form-data")]
-        public ActionResult UpdateWorker(int id, [FromBody] WorkerDTO workerDTO)
+        public async Task<ActionResult> UpdateWorkerAsync(int id, [FromBody] WorkerDTO workerDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -143,20 +143,20 @@ namespace ManageWorker_API.Controllers
 
             using (AppDbContext db = new())
             {
-                Worker? workerToUpdate = db.Worker.FirstOrDefault(worker => worker.Id == id);
+                Worker? workerToUpdate = await db.Worker.FirstOrDefaultAsync(worker => worker.Id == id);
 
                 if (workerToUpdate is null) return NotFound();
 
-                Stuff? newStuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == workerDTO.StuffId);
+                Stuff? newStuff = await db.Stuff.FirstOrDefaultAsync(stuff => stuff.Id == workerDTO.StuffId);
 
                 if (newStuff is null) return NotFound();
 
                 workerToUpdate.Name = workerDTO.Name;
-                workerToUpdate.AvatarUrl = UploadAvatarToFolder(workerDTO.Avatar);
+                workerToUpdate.AvatarUrl = UploadAvatarToFolderAsync(workerDTO.Avatar);
                 workerToUpdate.StuffId = workerDTO.StuffId;
                 workerToUpdate.Stuff = newStuff;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             return NoContent();

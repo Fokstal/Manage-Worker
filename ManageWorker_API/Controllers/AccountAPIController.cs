@@ -3,6 +3,7 @@ using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManageWorker_API.Controllers
 {
@@ -17,7 +18,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult SignUp(string key, [FromBody] UserDTO userDTO)
+        public async Task<IActionResult> SignUpAsync(string key, [FromBody] UserDTO userDTO)
         {
             if (key != keyToAddUser)
             {
@@ -29,7 +30,7 @@ namespace ManageWorker_API.Controllers
             using (AppDbContext db = new())
             {
 
-                if (db.User.FirstOrDefault(user => user.Login.ToLower() == userDTO.Login.ToLower()) is not null)
+                if (await db.User.FirstOrDefaultAsync(user => user.Login.ToLower() == userDTO.Login.ToLower()) is not null)
                 {
                     ModelState.AddModelError("CustomError", "User already Exists!");
 
@@ -47,11 +48,11 @@ namespace ManageWorker_API.Controllers
                 user.PasswordHash = HashWorker.GenerateSpecialHashBySHA512(user, userDTO.Password);
 
 
-                db.User.Add(user);
+                await db.User.AddAsync(user);
 
                 // db.RefreshToken.Add(GenerateRefreshToken());
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             // string? jwt = GenerateJWTToken(userDTO.Login);
@@ -68,11 +69,11 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult Login([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> LoginAsync([FromBody] UserDTO userDTO)
         {
             using (AppDbContext db = new())
             {
-                User? user = db.User.FirstOrDefault(user => user.Login == userDTO.Login);
+                User? user = await db.User.FirstOrDefaultAsync(user => user.Login == userDTO.Login);
 
                 if (user is null) return NotFound();
 
@@ -82,7 +83,7 @@ namespace ManageWorker_API.Controllers
             }
 
             RefreshToken refreshToken = TokenWorker.GenerateRefreshToken();
-            string? jwt = TokenWorker.GenerateJWTToken(userDTO.Login);
+            string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
 
             if (jwt is null) return Unauthorized();
 
@@ -99,13 +100,13 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult AuthByRefreshToken(string? refreshTokenValue)
+        public async Task<IActionResult> AuthByRefreshTokenAsync(string? refreshTokenValue)
         {
             if (refreshTokenValue is null) return BadRequest();
 
             using (AppDbContext db = new())
             {
-                RefreshToken? refreshToken = db.RefreshToken.FirstOrDefault(token => token.Value == refreshTokenValue);
+                RefreshToken? refreshToken = await db.RefreshToken.FirstOrDefaultAsync(token => token.Value == refreshTokenValue);
 
                 if (refreshToken is null) return NotFound();
 
@@ -116,7 +117,7 @@ namespace ManageWorker_API.Controllers
                     return Unauthorized(ModelState);
                 }
 
-                User? user = db.User.FirstOrDefault(user => user.Id == refreshToken.Id);
+                User? user = await db.User.FirstOrDefaultAsync(user => user.Id == refreshToken.Id);
 
                 if (user is null) return NotFound();
 
@@ -124,11 +125,11 @@ namespace ManageWorker_API.Controllers
 
                 refreshToken = newRefreshToken;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
 
                 return Ok(new
                 {
-                    access_token = TokenWorker.GenerateJWTToken(user.Login),
+                    access_token = TokenWorker.GenerateJWTTokenAsync(user.Login),
                     refresh_token = newRefreshToken,
                 });
             }
