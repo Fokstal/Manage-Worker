@@ -14,6 +14,5 @@ namespace ManageWorker_API.Models.Dto
 
         [Required]
         public int StuffId { get; set; }
-        public Stuff? Stuff { get; set; }
     }
 }
