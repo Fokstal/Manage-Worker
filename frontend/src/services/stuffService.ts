@@ -1,17 +1,16 @@
 import stuff from "../types/stuff";
 
 class StuffService {
-  private readonly url = 'http://localhost:5177/api/StuffAPI';
+  private readonly url = 'http://localhost:5177/stuff';
 
   public getStuffs = async () : Promise<Array<stuff>> => {
     const res = await fetch(this.url, {
       method : 'GET',
       headers : {
         'Content-Type' : 'application/json',
-        'Authorization' : JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
       },
     });
-
     if (!res.ok) throw new Error(await res.json());
 
     return await res.json();
@@ -22,10 +21,26 @@ class StuffService {
       method : 'GET',
       headers : {
         'Content-Type' : 'application/json',
-        'Authorization' : JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
       }
     });
 
+    if (!res.ok) throw new Error(await res.json());
+
+    return await res.json();
+  }
+
+  public createStuff = async (stuff : stuff) : Promise<any> => {
+    const res = await fetch(this.url, {
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json',
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+      },
+      body : JSON.stringify({
+        "name": stuff.name,
+      })
+    });
     if (!res.ok) throw new Error(await res.json());
 
     return await res.json();
