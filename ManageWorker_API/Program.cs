@@ -11,7 +11,8 @@ builder.Services.AddCors(options => options.AddPolicy(myCorsName,
     {
         policy
         .WithOrigins("http://localhost:3000")
-        .WithHeaders("Authorization", "Content-Type");
+        .WithHeaders("Authorization", "Content-Type")
+        .WithMethods("PUT", "DELETE");
     }));
 
 builder.Services.AddAuthorization();
