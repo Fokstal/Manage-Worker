@@ -45,6 +45,20 @@ class StuffService {
 
     return await res.json();
   }
+
+  public deleteStuff = async (id : number) : Promise<any> => {
+    const res = await fetch(`${this.url}/${id}`, {
+      method : 'DELETE',
+      headers : {
+        'Content-Type' : 'application/json',
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+      }
+    });
+
+    if (!res.ok) throw new Error(await res.json());
+
+    return await res.json();
+  }
 }
 
 export default StuffService;

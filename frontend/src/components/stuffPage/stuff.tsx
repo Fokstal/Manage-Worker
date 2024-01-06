@@ -51,8 +51,22 @@ const Stuff = () => {
         {`Колличество работников - ${item?.countWorker}`}
       </Typography>
       <Grid sx={{gap: '10px', display: 'flex'}}>
-        {isAuth ? <Button variant="outlined">Change</Button> : null}
-        {isAuth ? <Button variant="outlined" color="error">Delete</Button> : null}
+        {isAuth ? <Button variant="contained">Change</Button> : null}
+        {isAuth ? 
+        <Button 
+          variant="contained" 
+          color="error"
+          onClick={() => {
+            const service = new StuffService();
+            if (stuffId) {
+              service.deleteStuff(+stuffId)
+              .then(() => alert("Успешно удаленно"));
+            }
+          }}>
+            Delete
+        </Button> 
+        : 
+        null}
       </Grid>
     </>
   )
