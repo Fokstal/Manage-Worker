@@ -86,7 +86,7 @@ namespace ManageWorker_API.Controllers
                     Name = workerDTO.Name,
                     StuffId = workerDTO.StuffId,
                     Stuff = stuff,
-                    AvatarUrl = UploadAvatarToFolderAsync(workerDTO.Avatar),
+                    AvatarUrl = await UploadAvatarToFolderAsync(workerDTO.Avatar),
                 };
 
                 await db.Worker.AddAsync(worker);
@@ -152,7 +152,7 @@ namespace ManageWorker_API.Controllers
                 if (newStuff is null) return NotFound();
 
                 workerToUpdate.Name = workerDTO.Name;
-                workerToUpdate.AvatarUrl = UploadAvatarToFolderAsync(workerDTO.Avatar);
+                workerToUpdate.AvatarUrl = await UploadAvatarToFolderAsync(workerDTO.Avatar);
                 workerToUpdate.StuffId = workerDTO.StuffId;
                 workerToUpdate.Stuff = newStuff;
 
