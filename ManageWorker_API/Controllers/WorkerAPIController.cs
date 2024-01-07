@@ -21,14 +21,14 @@ namespace ManageWorker_API.Controllers
         {
             AppDbContext db = new();
 
-            List<Worker> workerList = [.. await db.Worker.Include(worker => worker.Stuff).ToArrayAsync()];
+            List<Worker> workerList = [.. await db.Worker./*Include(worker => worker.Stuff).*/ToArrayAsync()];
 
-            workerList.ForEach(worker =>
-            {
-                using FileStream fileStream = System.IO.File.OpenRead(avatarFolderPath + worker.AvatarUrl!);
+            // workerList.ForEach(worker =>
+            // {
+            //     using FileStream fileStream = System.IO.File.OpenRead(avatarFolderPath + worker.AvatarUrl!);
 
-                worker.Avatar = new FormFile(fileStream, 0, fileStream.Length, null!, Path.GetFileName(fileStream.Name));
-            });
+            //     worker.Avatar = new FormFile(fileStream, 0, fileStream.Length, null!, Path.GetFileName(fileStream.Name));
+            // });
 
             return Ok(workerList);
         }
@@ -49,9 +49,9 @@ namespace ManageWorker_API.Controllers
 
             if (worker is null) return NotFound();
 
-            using FileStream fileStream = System.IO.File.OpenRead(avatarFolderPath + worker.AvatarUrl!);
+            // using FileStream fileStream = System.IO.File.OpenRead(avatarFolderPath + worker.AvatarUrl!);
 
-            worker.Avatar = new FormFile(fileStream, 0, fileStream.Length, null!, Path.GetFileName(fileStream.Name));
+            // worker.Avatar = new FormFile(fileStream, 0, fileStream.Length, null!, Path.GetFileName(fileStream.Name));
 
             return Ok(worker);
         }
