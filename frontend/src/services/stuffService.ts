@@ -30,7 +30,7 @@ class StuffService {
     return await res.json();
   }
 
-  public createStuff = async (stuff : stuff) : Promise<any> => {
+  public createStuff = async (stuff : stuff) : Promise<stuff> => {
     const res = await fetch(this.url, {
       method : 'POST',
       headers : {
@@ -46,7 +46,7 @@ class StuffService {
     return await res.json();
   }
 
-  public deleteStuff = async (id : number) : Promise<any> => {
+  public deleteStuff = async (id : number) : Promise<void> => {
     const res = await fetch(`${this.url}/${id}`, {
       method : 'DELETE',
       headers : {
@@ -55,9 +55,24 @@ class StuffService {
       }
     });
 
-    if (!res.ok) throw new Error(await res.json());
+    console.log(res);
+    if (!res.ok) throw new Error(await res.statusText);
+  }
 
-    return await res.json();
+  public ChangeStuff = async (id : number, stuff : stuff) : Promise<void> => {
+    const res = await fetch(`${this.url}/${id}`, {
+      method : 'PUT',
+      headers : {
+        'Content-Type' : 'application/json',
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+      },
+      body : JSON.stringify({
+        "id" : id,
+        "name": stuff.name,
+      })
+    });
+
+    if (!res.ok) throw new Error(res.statusText);
   }
 }
 
