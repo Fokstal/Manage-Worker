@@ -47,10 +47,9 @@ namespace ManageWorker_API.Controllers
 
                 user.PasswordHash = HashWorker.GenerateSpecialHashBySHA512(user, userDTO.Password);
 
-
                 await db.User.AddAsync(user);
 
-                RefreshToken refreshToken = TokenWorker.GenerateRefreshToken();
+                RefreshToken refreshToken = TokenWorker.GenerateRefreshToken(user);
 
                 db.RefreshToken.Add(refreshToken);
 
@@ -84,18 +83,19 @@ namespace ManageWorker_API.Controllers
                 string passwordHash = HashWorker.GenerateSpecialHashBySHA512(user, userDTO.Password);
 
                 if (passwordHash != user.PasswordHash) return Unauthorized();
+
+                RefreshToken refreshToken = TokenWorker.GenerateRefreshToken(user);
+                string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
+
+                if (jwt is null) return Unauthorized();
+
+                return Ok(new
+                {
+                    access_token = jwt,
+                    refresh_token = refreshToken.Value
+                });
             }
 
-            RefreshToken refreshToken = TokenWorker.GenerateRefreshToken();
-            string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
-
-            if (jwt is null) return Unauthorized();
-
-            return Ok(new
-            {
-                access_token = jwt,
-                refresh_token = refreshToken.Value
-            });
         }
 
         [HttpPost("auth-refresh/{refreshTokenValue}")]
@@ -114,7 +114,7 @@ namespace ManageWorker_API.Controllers
 
                 if (refreshToken is null) return NotFound();
 
-                if (refreshToken.ExpiryTime > DateTime.Now)
+                if (DateTime.Now > refreshToken.ExpiryTime)
                 {
                     ModelState.AddModelError("Custom Error", "Refresh token expiry time is up!");
 
@@ -125,16 +125,14 @@ namespace ManageWorker_API.Controllers
 
                 if (user is null) return NotFound();
 
-                RefreshToken newRefreshToken = TokenWorker.GenerateRefreshToken();
-
-                refreshToken = newRefreshToken;
+                refreshToken.Value = TokenWorker.GenerateRefreshToken(user).Value;
 
                 await db.SaveChangesAsync();
 
                 return Ok(new
                 {
                     access_token = TokenWorker.GenerateJWTTokenAsync(user.Login),
-                    refresh_token = newRefreshToken,
+                    refresh_token = refreshToken.Value,
                 });
             }
         }

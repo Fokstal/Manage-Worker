@@ -10,7 +10,7 @@ namespace ManageWorker_API.Service
 {
     public static class TokenWorker
     {
-        private static readonly int timeLifeJWTinSecond = 3600;
+        private static readonly int timeLifeJWTinSecond = 1;
         private static readonly int timeLifeRefreshInDay = 15;
 
         public static async Task<string?> GenerateJWTTokenAsync(string login)
@@ -32,7 +32,7 @@ namespace ManageWorker_API.Service
             return encodedJwt;
         }
 
-        public static RefreshToken GenerateRefreshToken()
+        public static RefreshToken GenerateRefreshToken(User user)
         {
             RefreshToken refreshToken = new();
 
@@ -42,8 +42,10 @@ namespace ManageWorker_API.Service
                 rng.GetBytes(randomNumber);
             }
 
-            refreshToken.Value = Convert.ToBase64String(randomNumber);
+            refreshToken.Value = Convert.ToBase64String(randomNumber).Replace('/', '#');
             refreshToken.ExpiryTime = DateTime.Now.Add(TimeSpan.FromDays(timeLifeRefreshInDay));
+            refreshToken.UserId = user.Id;
+            refreshToken.User = user;
 
             return refreshToken;
         }
