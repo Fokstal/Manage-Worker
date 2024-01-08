@@ -50,18 +50,22 @@ namespace ManageWorker_API.Controllers
 
                 await db.User.AddAsync(user);
 
-                // db.RefreshToken.Add(GenerateRefreshToken());
+                RefreshToken refreshToken = TokenWorker.GenerateRefreshToken();
+
+                db.RefreshToken.Add(refreshToken);
 
                 await db.SaveChangesAsync();
+
+                string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
+
+                if (jwt is null) return Unauthorized();
+
+                return Ok(new
+                {
+                    access_token = jwt,
+                    refresh_token = refreshToken.Value
+                });
             }
-
-            // string? jwt = GenerateJWTToken(userDTO.Login);
-
-            // if (jwt is null) return Unauthorized();
-
-            // return Ok(jwt);
-            
-            return Ok();
         }
 
         [HttpPost("login/", Name = "Login")]
