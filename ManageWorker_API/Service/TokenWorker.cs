@@ -10,7 +10,7 @@ namespace ManageWorker_API.Service
 {
     public static class TokenWorker
     {
-        private static readonly int timeLifeJWTinSecond = 1;
+        private static readonly int timeLifeJWTinSecond = 3600;
         private static readonly int timeLifeRefreshInDay = 15;
 
         public static async Task<string?> GenerateJWTTokenAsync(string login)
