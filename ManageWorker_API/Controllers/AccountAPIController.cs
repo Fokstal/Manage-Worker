@@ -91,13 +91,13 @@ namespace ManageWorker_API.Controllers
 
         }
 
-        [HttpPost("auth-refresh/{refreshTokenValue}")]
+        [HttpPost("auth-refresh/")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AuthByRefreshTokenAsync(string? refreshTokenValue)
+        public async Task<IActionResult> AuthByRefreshTokenAsync([FromBody] string? refreshTokenValue)
         {
             if (refreshTokenValue is null) return BadRequest();
 
