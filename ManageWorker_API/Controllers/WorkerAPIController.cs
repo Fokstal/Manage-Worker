@@ -12,7 +12,7 @@ namespace ManageWorker_API.Controllers
     [ApiController]
     [AuthorizeExpiry]
     public class WorkerAPIController : ControllerBase
-    {   
+    {
         [HttpGet(Name = "GetWorkerList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -21,14 +21,7 @@ namespace ManageWorker_API.Controllers
         {
             AppDbContext db = new();
 
-            List<Worker> workerList = [.. await db.Worker./*Include(worker => worker.Stuff).*/ToArrayAsync()];
-
-            // workerList.ForEach(worker =>
-            // {
-            //     using FileStream fileStream = System.IO.File.OpenRead(avatarFolderPath + worker.AvatarUrl!);
-
-            //     worker.Avatar = new FormFile(fileStream, 0, fileStream.Length, null!, Path.GetFileName(fileStream.Name));
-            // });
+            List<Worker> workerList = [.. await db.Worker.ToArrayAsync()];
 
             return Ok(workerList);
         }
@@ -48,10 +41,6 @@ namespace ManageWorker_API.Controllers
             Worker? worker = await db.Worker.FirstOrDefaultAsync(worker => worker.Id == id);
 
             if (worker is null) return NotFound();
-
-            // using FileStream fileStream = System.IO.File.OpenRead(avatarFolderPath + worker.AvatarUrl!);
-
-            // worker.Avatar = new FormFile(fileStream, 0, fileStream.Length, null!, Path.GetFileName(fileStream.Name));
 
             return Ok(worker);
         }
@@ -85,7 +74,6 @@ namespace ManageWorker_API.Controllers
                 {
                     Name = workerDTO.Name,
                     StuffId = workerDTO.StuffId,
-                    Stuff = stuff,
                     AvatarUrl = await UploadAvatarToFolderAsync(workerDTO.Avatar),
                 };
 
@@ -113,11 +101,12 @@ namespace ManageWorker_API.Controllers
 
                 if (worker is null) return NotFound();
 
+                if (worker.AvatarUrl != defaultAvatarName) System.IO.File.Delete($"{avatarFolderPath}{worker.AvatarUrl!}");
+
                 db.Worker.Remove(worker);
 
                 await db.SaveChangesAsync();
 
-                System.IO.File.Delete(worker.AvatarUrl!);
             }
 
             return NoContent();
@@ -130,7 +119,7 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult> UpdateWorkerAsync(int id, [FromBody] WorkerDTO workerDTO)
+        public async Task<ActionResult> UpdateWorkerAsync(int id, [FromForm] WorkerDTO workerDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -151,10 +140,11 @@ namespace ManageWorker_API.Controllers
 
                 if (newStuff is null) return NotFound();
 
+                if (workerToUpdate.AvatarUrl != defaultAvatarName) System.IO.File.Delete($"{avatarFolderPath}{workerToUpdate.AvatarUrl!}");
+
                 workerToUpdate.Name = workerDTO.Name;
                 workerToUpdate.AvatarUrl = await UploadAvatarToFolderAsync(workerDTO.Avatar);
                 workerToUpdate.StuffId = workerDTO.StuffId;
-                workerToUpdate.Stuff = newStuff;
 
                 await db.SaveChangesAsync();
             }

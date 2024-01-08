@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ManageWorker_API.Models
 {
     public class Stuff
@@ -6,6 +8,7 @@ namespace ManageWorker_API.Models
 
         public string Name { get; set; } = null!;
 
+        [NotMapped]
         public int CountWorker
         {
             get
@@ -13,6 +16,8 @@ namespace ManageWorker_API.Models
                 return WorkerList.Count;
             }
         }
+        
+        [NotMapped]
         public List<Worker> WorkerList { get; set; } = [];
 
         public DateTime CreatedDate { get; set; }
