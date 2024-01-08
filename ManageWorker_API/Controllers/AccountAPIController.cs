@@ -118,7 +118,7 @@ namespace ManageWorker_API.Controllers
                     return Unauthorized(ModelState);
                 }
 
-                User? user = await db.User.FirstOrDefaultAsync(user => user.Id == refreshToken.Id);
+                User? user = await db.User.FirstOrDefaultAsync(user => user.Id == refreshToken.UserId);
 
                 if (user is null) return NotFound();
 
@@ -128,7 +128,7 @@ namespace ManageWorker_API.Controllers
 
                 return Ok(new
                 {
-                    access_token = TokenWorker.GenerateJWTTokenAsync(user.Login),
+                    access_token = await TokenWorker.GenerateJWTTokenAsync(user.Login),
                     refresh_token = refreshToken.Value,
                 });
             }
