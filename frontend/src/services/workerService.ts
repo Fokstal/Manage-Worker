@@ -30,6 +30,32 @@ class WorkerService {
 
     return await res.json();
   }
+
+  public getWorker = async (id : number) : Promise<worker> => {
+    const res = await fetch(`${this.url}/${id}`, {
+      method : 'GET',
+      headers : {
+        'Content-Type' : 'application/json',
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+      }
+    });
+
+    if (!res.ok) throw new Error(await res.json());
+
+    return await res.json();
+  }
+
+  public editWorker = async (id : number, worker : FormData) : Promise<void> => {
+    const res = await fetch(`${this.url}/${id}`, {
+      method : 'PUT',
+      headers : {
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+      },
+      body : worker
+    });
+
+    if (!res.ok) throw new Error(res.statusText);
+  }
 }
 
 export default WorkerService;

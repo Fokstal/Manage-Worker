@@ -97,7 +97,6 @@ const Workers = () => {
         open={isOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
       >
         <Box sx={style} component={"form"} onSubmit={createWorker} noValidate>
           <Typography id="modal-modal-title" variant="h6" component="h2" sx={{textAlign: "center", fontWeight: "bold"}}>

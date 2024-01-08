@@ -1,7 +1,7 @@
 type worker = {
   id? : number,
   name : string,
-  avatar? : any,
+  avatarUrl? : string,
   stuffId : number,
 }
 
