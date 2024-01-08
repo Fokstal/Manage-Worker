@@ -49,21 +49,9 @@ namespace ManageWorker_API.Controllers
 
                 await db.User.AddAsync(user);
 
-                RefreshToken refreshToken = TokenWorker.GenerateRefreshToken(user);
-
-                db.RefreshToken.Add(refreshToken);
-
                 await db.SaveChangesAsync();
 
-                string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
-
-                if (jwt is null) return Unauthorized();
-
-                return Ok(new
-                {
-                    access_token = jwt,
-                    refresh_token = refreshToken.Value
-                });
+                return Ok();
             }
         }
 
@@ -85,6 +73,11 @@ namespace ManageWorker_API.Controllers
                 if (passwordHash != user.PasswordHash) return Unauthorized();
 
                 RefreshToken refreshToken = TokenWorker.GenerateRefreshToken(user);
+
+                db.RefreshToken.Add(refreshToken);
+
+                await db.SaveChangesAsync();
+
                 string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
 
                 if (jwt is null) return Unauthorized();
