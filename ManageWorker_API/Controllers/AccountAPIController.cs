@@ -72,6 +72,10 @@ namespace ManageWorker_API.Controllers
 
                 if (passwordHash != user.PasswordHash) return Unauthorized();
 
+                RefreshToken? refreshTokenOld = await db.RefreshToken.FirstOrDefaultAsync(token => token.UserId == user.Id);
+
+                if (refreshTokenOld is not null) db.Remove(refreshTokenOld);
+
                 RefreshToken refreshToken = TokenWorker.GenerateRefreshToken(user);
 
                 db.RefreshToken.Add(refreshToken);
