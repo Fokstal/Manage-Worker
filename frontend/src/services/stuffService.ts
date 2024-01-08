@@ -55,8 +55,7 @@ class StuffService {
       }
     });
 
-    console.log(res);
-    if (!res.ok) throw new Error(await res.statusText);
+    if (!res.ok) throw new Error(res.statusText);
   }
 
   public ChangeStuff = async (id : number, stuff : stuff) : Promise<void> => {

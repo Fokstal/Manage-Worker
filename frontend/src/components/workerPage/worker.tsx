@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Grid, Modal, TextField, Typography } from "@mui/material";
 import { useAppSelector } from "../../hooks/hooks";
 import WorkerService from "../../services/workerService";
 import worker from "../../types/worker";
 import StuffService from "../../services/stuffService";
 import stuff from "../../types/stuff";
+import './worker.css';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -25,6 +26,7 @@ const Worker = () => {
   const [stuff, setsTuff] = useState<stuff>();
   const [isOpen, openCloseModal] = useState<boolean>(false);
   const isAuth = useAppSelector(state => state.auth.isAuth);
+  const navigate = useNavigate();
 
   const handleOpen = () => openCloseModal(true);
   const handleClose = () => openCloseModal(false);
@@ -46,6 +48,13 @@ const Worker = () => {
     })
   };
 
+  const deleteItem = () => {
+    const service = new WorkerService();
+    service.deleteWorker(+(workerId ?? 0)).then(() => {
+      navigate('/workers');
+    })
+  }
+
   const editWorker = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -64,7 +73,7 @@ const Worker = () => {
   }, [])
   return (
     <>
-      <img src={`http://localhost:5177/images/avatars/${item?.avatarUrl}`} alt="Worker icon"/>
+      <img className="worker-image" src={`http://localhost:5177/images/avatars/${item?.avatarUrl}`} alt="Worker icon"/>
       <Typography 
         variant="h3"
         sx={{
@@ -95,7 +104,7 @@ const Worker = () => {
       </Typography>
       <Grid sx={{gap: '10px', display: 'flex'}}>
         {isAuth ? <Button variant="contained" onClick={handleOpen}>Change</Button> : null}
-        {isAuth ? <Button variant="contained" color="error" onClick={()=>{}}>Delete</Button> : null}
+        {isAuth ? <Button variant="contained" color="error" onClick={deleteItem}>Delete</Button> : null}
         <Modal
         open={isOpen}
         onClose={handleClose}
@@ -135,7 +144,7 @@ const Worker = () => {
             id="avatar"
             focused
           /> 
-          <Button variant="outlined" color="success" type="submit">Create</Button>
+          <Button variant="outlined" color="success" type="submit">Change</Button>
         </Box>
       </Modal>
       </Grid>

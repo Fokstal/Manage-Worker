@@ -56,6 +56,17 @@ class WorkerService {
 
     if (!res.ok) throw new Error(res.statusText);
   }
+
+  public deleteWorker = async (id : number) : Promise<void> => {
+    const res = await fetch(`${this.url}/${id}`, {
+      method : 'DELETE',
+      headers : {
+        'Authorization' : 'Bearer ' + JSON.parse(localStorage.getItem('jwt-token')!)['access_token']
+      }
+    });
+
+    if (!res.ok) throw new Error(res.statusText);
+  }
 }
 
 export default WorkerService;
