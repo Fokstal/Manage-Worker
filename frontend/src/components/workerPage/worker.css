@@ -1,0 +1,7 @@
+.worker-image {
+  max-width: 300px;
+  object-fit: cover;
+  margin: 10px;
+  border-radius: 15px;
+  border: solid black 2px;
+}
