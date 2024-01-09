@@ -141,3 +141,4 @@
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/runtimes/win-arm64/native/e_sqlite3.dll
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/runtimes/win-x64/native/e_sqlite3.dll
 /home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/runtimes/win-x86/native/e_sqlite3.dll
+/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/bin/Debug/net8.0/ManageWorker_API.staticwebassets.runtime.json

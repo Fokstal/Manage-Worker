@@ -1,4 +1,4 @@
-using ManageWorker_API.Data;
+using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -6,14 +6,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 string myCorsName = "CorsPolicy";
 
-// Add services to the container.
-
 builder.Services.AddCors(options => options.AddPolicy(myCorsName,
-    builder =>
+    policy =>
     {
-        builder
-        .AllowAnyOrigin()
-        .AllowAnyHeader();
+        policy
+        .WithOrigins("http://localhost:3000")
+        .WithHeaders("Authorization", "Content-Type")
+        .WithMethods("PUT", "DELETE");
     }));
 
 builder.Services.AddAuthorization();
@@ -56,6 +55,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

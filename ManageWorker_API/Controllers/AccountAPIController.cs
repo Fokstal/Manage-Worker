@@ -1,28 +1,24 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using ManageWorker_API.Data;
 using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using ManageWorker_API.Service;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManageWorker_API.Controllers
 {
-    [Route("[controller]")]
+    [Route("account/")]
     public class AccountAPIController : ControllerBase
     {
-        private static readonly int timeLifeJWTinSecond = 3600;
         private static readonly string keyToAddUser = "KeyToAdd99Key";
 
-        [HttpPost("{key}", Name = "SignUp")]
+
+        [HttpPost("sign-up/{key}", Name = "SignUp")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult SignUp(string key, [FromBody] UserDTO userDTO)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SignUpAsync(string key, [FromBody] UserDTO userDTO)
         {
             if (key != keyToAddUser)
             {
@@ -34,7 +30,7 @@ namespace ManageWorker_API.Controllers
             using (AppDbContext db = new())
             {
 
-                if (db.User.FirstOrDefault(user => user.Login.ToLower() == userDTO.Login.ToLower()) is not null)
+                if (await db.User.FirstOrDefaultAsync(user => user.Login.ToLower() == userDTO.Login.ToLower()) is not null)
                 {
                     ModelState.AddModelError("CustomError", "User already Exists!");
 
@@ -49,80 +45,93 @@ namespace ManageWorker_API.Controllers
 
                 if (userDTO.Email is not null) user.Email = userDTO.Email;
 
-                user.PasswordHash = GenerateSpecialHashBySHA512(user, userDTO.Password);
+                user.PasswordHash = HashWorker.GenerateSpecialHashBySHA512(user, userDTO.Password);
 
+                await db.User.AddAsync(user);
 
-                db.User.Add(user);
+                await db.SaveChangesAsync();
 
-                db.SaveChanges();
+                return Ok();
             }
-
-            string? jwt = Authentication(userDTO.Login);
-
-            if (jwt is null) return Unauthorized();
-
-            return Ok(jwt);
         }
 
-        [HttpPost(Name = "Login")]
+        [HttpPost("login/", Name = "Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Login([FromBody] UserDTO userDTO)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoginAsync([FromBody] UserDTO userDTO)
         {
             using (AppDbContext db = new())
             {
-                User? user = db.User.FirstOrDefault(user => user.Login == userDTO.Login);
+                User? user = await db.User.FirstOrDefaultAsync(user => user.Login == userDTO.Login);
 
                 if (user is null) return NotFound();
 
-                string passwordHash = GenerateSpecialHashBySHA512(user, userDTO.Password);
+                string passwordHash = HashWorker.GenerateSpecialHashBySHA512(user, userDTO.Password);
 
                 if (passwordHash != user.PasswordHash) return Unauthorized();
+
+                RefreshToken? refreshTokenOld = await db.RefreshToken.FirstOrDefaultAsync(token => token.UserId == user.Id);
+
+                if (refreshTokenOld is not null) db.Remove(refreshTokenOld);
+
+                RefreshToken refreshToken = TokenWorker.GenerateRefreshToken(user);
+
+                db.RefreshToken.Add(refreshToken);
+
+                await db.SaveChangesAsync();
+
+                string? jwt = await TokenWorker.GenerateJWTTokenAsync(userDTO.Login);
+
+                if (jwt is null) return Unauthorized();
+
+                return Ok(new
+                {
+                    access_token = jwt,
+                    refresh_token = refreshToken.Value
+                });
             }
 
-            string? jwt = Authentication(userDTO.Login);
-
-            if (jwt is null) return Unauthorized();
-
-            return Ok(jwt);
         }
 
-
-        private static string GenerateSHA512SaltedHash(string password, string salt = "")
+        [HttpPost("auth-refresh/")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AuthByRefreshTokenAsync([FromBody] string? refreshTokenValue)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(password + salt);
-            byte[] hash = SHA512.HashData(bytes);
+            if (refreshTokenValue is null) return BadRequest();
 
-            return Convert.ToBase64String(hash);
-        }
+            using (AppDbContext db = new())
+            {
+                RefreshToken? refreshToken = await db.RefreshToken.FirstOrDefaultAsync(token => token.Value == refreshTokenValue);
 
-        private static string GenerateSpecialHashBySHA512(User user, string password)
-        {
-            return GenerateSHA512SaltedHash
-            (
-                GenerateSHA512SaltedHash(user.Login + password),
-                GenerateSHA512SaltedHash(user.DateCreated.ToString())
-            );
-        }
+                if (refreshToken is null) return NotFound();
 
-        private static string? Authentication(string login)
-        {
-            if (new AppDbContext().User.FirstOrDefault(user => user.Login == login) is null) return null;
+                if (DateTime.Now > refreshToken.ExpiryTime)
+                {
+                    ModelState.AddModelError("Custom Error", "Refresh token expiry time is up!");
 
-            List<Claim> claims = [new(ClaimTypes.Name, login)];
+                    return Unauthorized(ModelState);
+                }
 
-            JwtSecurityToken jwt = new(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    claims: claims,
-                    notBefore: DateTime.Now,
-                    expires: DateTime.Now.Add(TimeSpan.FromSeconds(timeLifeJWTinSecond)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                User? user = await db.User.FirstOrDefaultAsync(user => user.Id == refreshToken.UserId);
 
-            string encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+                if (user is null) return NotFound();
 
-            return encodedJwt;
+                refreshToken.Value = TokenWorker.GenerateRefreshToken(user).Value;
+
+                await db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    access_token = await TokenWorker.GenerateJWTTokenAsync(user.Login),
+                    refresh_token = refreshToken.Value,
+                });
+            }
         }
     }
 }
