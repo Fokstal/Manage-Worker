@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "/E2oqhR8bH0BNWPJ4VOyJ32CXvixmLlYeXu5iDFG1Y8=",
+  "Source": "ManageWorker_API",
+  "BasePath": "_content/ManageWorker_API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "ManageWorker_API/wwwroot",
+      "Source": "ManageWorker_API",
+      "ContentRoot": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/wwwroot/",
+      "BasePath": "_content/ManageWorker_API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/wwwroot/images/avatars/default.jpg",
+      "SourceId": "ManageWorker_API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/wwwroot/",
+      "BasePath": "_content/ManageWorker_API",
+      "RelativePath": "images/avatars/default.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/images/avatars/default.jpg"
+    }
+  ]
+}
