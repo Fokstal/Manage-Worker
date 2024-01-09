@@ -3,24 +3,22 @@ using ManageWorker_API.Models;
 using ManageWorker_API.Models.Dto;
 using ManageWorker_API.Service;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ManageWorker_API.Controllers
 {
-    [Route("stuff/")]
+    [Route("api/[controller]")]
     [ApiController]
-    [AuthorizeExpiry]
+    // [AuthorizeExpiry]
     public class StuffAPIController : ControllerBase
     {
-        [HttpGet(Name = "GetStuffList")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<StuffDTO>>> GetStuffListAsync()
+        public ActionResult<IEnumerable<StuffDTO>> GetStuffs()
         {
             AppDbContext db = new();
 
-            return Ok(await db.Stuff.ToArrayAsync());
+            return Ok(db.Stuff);
         }
 
         [HttpGet("{id:int}", Name = "GetStuff")]
@@ -28,12 +26,11 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StuffDTO>> GetStuffAsync(int id)
+        public ActionResult<StuffDTO> GetStuff(int id)
         {
             if (id <= 0) return BadRequest();
 
-            Stuff? stuff = await new AppDbContext().Stuff.FirstOrDefaultAsync(stuff => stuff.Id == id);
+            Stuff? stuff = new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
             if (stuff is not null)
             {
@@ -46,6 +43,7 @@ namespace ManageWorker_API.Controllers
                 return Ok(stuff);
             }
 
+
             return NotFound();
         }
 
@@ -54,9 +52,10 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StuffDTO>> CreateStuffAsync([FromBody] StuffDTO stuffDTO)
+        public ActionResult<StuffDTO> CreateStuff([FromBody] StuffDTO stuffDTO)
         {
-            if (await new AppDbContext().Stuff.FirstOrDefaultAsync(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
+            // if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (new AppDbContext().Stuff.FirstOrDefault(stuff => stuff.Name.ToLower() == stuffDTO.Name.ToLower()) is not null)
             {
                 ModelState.AddModelError("CustomError", "Stuff already Exists!");
 
@@ -66,15 +65,22 @@ namespace ManageWorker_API.Controllers
             if (stuffDTO is null) return BadRequest(stuffDTO);
             if (stuffDTO.Id > 0) return StatusCode(StatusCodes.Status500InternalServerError);
 
+            stuffDTO.Id = 1;
+
             using (AppDbContext db = new())
             {
+                Stuff? stuffByIdLast = db.Stuff.OrderByDescending(stuff => stuff.Id).FirstOrDefault();
+
+                if (stuffByIdLast is not null) stuffDTO.Id = stuffByIdLast.Id + 1;
+
                 db.Stuff.Add(new()
                 {
+                    Id = stuffDTO.Id,
                     Name = stuffDTO.Name,
                     CreatedDate = DateTime.Now,
                 });
 
-                await db.SaveChangesAsync();
+                db.SaveChanges();
             }
 
             return CreatedAtRoute("GetStuff", new { id = stuffDTO.Id }, stuffDTO);
@@ -85,20 +91,19 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteStuffAsync(int id)
+        public IActionResult DeleteStuff(int id)
         {
             if (id <= 0) return BadRequest();
 
             using (AppDbContext db = new())
             {
-                Stuff? stuff = await db.Stuff.FirstOrDefaultAsync(stuff => stuff.Id == id);
+                Stuff? stuff = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
                 if (stuff is null) return NotFound();
 
                 db.Stuff.Remove(stuff);
 
-                await db.SaveChangesAsync();
+                db.SaveChanges();
             }
 
             return NoContent();
@@ -109,28 +114,25 @@ namespace ManageWorker_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StuffDTO>> UpdateStuffAsync(int id, [FromBody] StuffDTO stuffDTO)
+        public ActionResult<StuffDTO> UpdateStuff(int id, [FromBody] StuffDTO stuffDTO)
         {
-            if (id < 1) return BadRequest();
-
             if (stuffDTO is null || id != stuffDTO.Id)
             {
-                ModelState.AddModelError("CustomError", "Id and Id in model are not equals!");
+                ModelState.AddModelError("CustomError", "Id in response and Id in Stuff is not equal!");
 
                 return BadRequest(ModelState);
             }
 
             using (AppDbContext db = new())
             {
-                Stuff? stuffToUpdate = await db.Stuff.FirstOrDefaultAsync(stuff => stuff.Id == id);
+                Stuff? stuffToUpdate = db.Stuff.FirstOrDefault(stuff => stuff.Id == id);
 
                 if (stuffToUpdate is null) return NotFound();
 
                 stuffToUpdate.Name = stuffDTO.Name;
                 stuffToUpdate.CreatedDate = DateTime.Now;
 
-                await db.SaveChangesAsync();
+                db.SaveChanges();
             }
 
             return NoContent();

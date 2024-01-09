@@ -17,28 +17,6 @@ namespace ManageWorker_API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
 
-            modelBuilder.Entity("ManageWorker_API.Models.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("ExpiryTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshToken");
-                });
-
             modelBuilder.Entity("ManageWorker_API.Models.Stuff", b =>
                 {
                     b.Property<int>("Id")
@@ -104,26 +82,20 @@ namespace ManageWorker_API.Migrations
                     b.ToTable("Worker");
                 });
 
-            modelBuilder.Entity("ManageWorker_API.Models.RefreshToken", b =>
-                {
-                    b.HasOne("ManageWorker_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ManageWorker_API.Models.Worker", b =>
                 {
                     b.HasOne("ManageWorker_API.Models.Stuff", "Stuff")
-                        .WithMany()
+                        .WithMany("WorkerList")
                         .HasForeignKey("StuffId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Stuff");
+                });
+
+            modelBuilder.Entity("ManageWorker_API.Models.Stuff", b =>
+                {
+                    b.Navigation("WorkerList");
                 });
 #pragma warning restore 612, 618
         }

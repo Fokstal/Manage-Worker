@@ -8,9 +8,6 @@ namespace ManageWorker_API.Models
         public string? Name { get; set; }
         public string? AvatarUrl { get; set; }
 
-        // [NotMapped]
-        // public IFormFile? Avatar { get; set; }
-
         public int StuffId { get; set; }
 
         [ForeignKey(nameof(StuffId))]
