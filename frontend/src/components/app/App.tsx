@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import Header from '../header/header';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -10,8 +10,19 @@ import Stuffs from '../stuffsPage/stuffs';
 import Stuff from '../stuffPage/stuff';
 import Workers from '../workersPage/workers';
 import Worker from '../workerPage/worker';
+import AuthService from '../../services/AuthService';
 
 function App() {
+
+  const refreshToken = () => {
+    const service = new AuthService();
+    service.refreshToken();
+  };
+
+  useEffect(() => {
+    refreshToken();
+  },[])
+
   return (
     <div className="App">
       <BrowserRouter>
