@@ -3367,11 +3367,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/ManageWorker_API.csproj",
+      "projectUniqueName": "/home/fokstal/Documents/Projects/Manage Worker/backend/ManageWorker_API.csproj",
       "projectName": "ManageWorker_API",
-      "projectPath": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/ManageWorker_API.csproj",
+      "projectPath": "/home/fokstal/Documents/Projects/Manage Worker/backend/ManageWorker_API.csproj",
       "packagesPath": "/home/fokstal/.nuget/packages/",
-      "outputPath": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/obj/",
+      "outputPath": "/home/fokstal/Documents/Projects/Manage Worker/backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/fokstal/.nuget/NuGet/NuGet.Config"

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "/E2oqhR8bH0BNWPJ4VOyJ32CXvixmLlYeXu5iDFG1Y8=",
+  "Hash": "Rx6LFFSDhkyrOyKOSKk2dFNFvXg98bUVzx0ZfCYWrsA=",
   "Source": "ManageWorker_API",
   "BasePath": "_content/ManageWorker_API",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "ManageWorker_API/wwwroot",
       "Source": "ManageWorker_API",
-      "ContentRoot": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/wwwroot/",
+      "ContentRoot": "/home/fokstal/Documents/Projects/Manage Worker/backend/wwwroot/",
       "BasePath": "_content/ManageWorker_API",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/wwwroot/images/avatars/default.jpg",
+      "Identity": "/home/fokstal/Documents/Projects/Manage Worker/backend/wwwroot/images/avatars/default.jpg",
       "SourceId": "ManageWorker_API",
       "SourceType": "Discovered",
-      "ContentRoot": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/wwwroot/",
+      "ContentRoot": "/home/fokstal/Documents/Projects/Manage Worker/backend/wwwroot/",
       "BasePath": "_content/ManageWorker_API",
       "RelativePath": "images/avatars/default.jpg",
       "AssetKind": "All",

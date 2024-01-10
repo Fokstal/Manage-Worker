@@ -1,26 +1,37 @@
 version: '3.8'
 services:
-  # react-app:
-  #   container_name: react-app
-  #   build: 
-  #     context: ./manage-worker_react/
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 3000:3000
-  #   depends_on:
-  #     - api
-  #   networks:
-  #     - app-network
-
-  api:
-    container_name: aspnetcore-api
+  client:
+    container_name: client
     build: 
-      context: ./ManageWorker_API/
+      context: ./frontend/
       dockerfile: Dockerfile
     ports:
-      - 80:8080
-    # networks:
-    #   - app-network
+      - 3000:3000
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+  api:
+    container_name: api
+    build: 
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - 5177:8080
+    volumes:
+      - type: volume
+        source: avatar_volume
+        target: /app/wwwroot/images/avatars
+      - type: volume
+        source: db_volume
+        target: /app/Appdata
+    networks:
+      - app-network
+
+volumes:
+  avatar_volume:
+  db_volume:
 
 networks:
   app-network:

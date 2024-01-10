@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rWRZjAvrtLfUkLZ9fGKSMPYexsE2cG0d07cyazTSrikbej6kUf9PRSos3QSt6eDbjrMpVoX4jD9OJgMAy+Wf1g==",
+  "dgSpecHash": "V/23UUFbM1o1Spp/OTshYnO2T38BOaidKQw1z+MEwuf5cZzd5pwVvrfON0bdeSAxvwzLRKTHnAzBlGL087aaeA==",
   "success": true,
-  "projectFilePath": "/home/fokstal/Documents/Projects/Manage Worker/ManageWorker_API/ManageWorker_API.csproj",
+  "projectFilePath": "/home/fokstal/Documents/Projects/Manage Worker/backend/ManageWorker_API.csproj",
   "expectedPackageFiles": [
     "/home/fokstal/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/home/fokstal/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.0/microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",
