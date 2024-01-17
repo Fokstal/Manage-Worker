@@ -1,7 +1,7 @@
 import user from "../types/user";
 
 class AuthService {
-  private url = 'http://localhost:5177/account/';
+  private url = process.env.REACT_APP_IP + '/account/';
   private key = 'KeyToAdd99Key';
 
   public register = async ({login, email, password} : user) : Promise<void> => {

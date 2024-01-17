@@ -13,7 +13,7 @@ import Worker from '../workerPage/worker';
 import AuthService from '../../services/AuthService';
 
 function App() {
-
+  console.log(process.env.REACT_APP_IP); 
   const refreshToken = () => {
     const service = new AuthService();
     service.refreshToken();
