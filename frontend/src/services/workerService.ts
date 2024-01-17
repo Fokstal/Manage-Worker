@@ -1,7 +1,7 @@
 import worker from "../types/worker";
 
 class WorkerService {
-  private url = 'http://localhost:5177/worker';
+  private url = process.env.REACT_APP_IP + '/worker';
 
   public getWorkers = async () : Promise<Array<worker>> => {
     const res = await fetch(this.url, {

@@ -13,7 +13,6 @@ import Worker from '../workerPage/worker';
 import AuthService from '../../services/AuthService';
 
 function App() {
-
   const refreshToken = () => {
     const service = new AuthService();
     service.refreshToken();

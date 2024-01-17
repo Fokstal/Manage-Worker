@@ -1,7 +1,7 @@
 import user from "../types/user";
 
 class AuthService {
-  private url = 'http://localhost:5177/account/';
+  private url = process.env.REACT_APP_IP + '/account/';
   private key = 'KeyToAdd99Key';
 
   public register = async ({login, email, password} : user) : Promise<void> => {
@@ -42,7 +42,7 @@ class AuthService {
   public refreshToken = async () : Promise<void> => {
     const refresh_token = JSON.parse(localStorage.getItem('jwt-token')!);
     if (!refresh_token) return;
-    console.log(refresh_token['refresh_token']);
+
     const res = await fetch(`${this.url}auth-refresh/`, {
       method : 'POST',
       headers : {

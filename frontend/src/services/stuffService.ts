@@ -1,7 +1,7 @@
 import stuff from "../types/stuff";
 
 class StuffService {
-  private readonly url = 'http://localhost:5177/stuff';
+  private readonly url = process.env.REACT_APP_IP + '/stuff';
 
   public getStuffs = async () : Promise<Array<stuff>> => {
     const res = await fetch(this.url, {
