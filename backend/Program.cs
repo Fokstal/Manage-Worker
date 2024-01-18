@@ -10,7 +10,8 @@ builder.Services.AddCors(options => options.AddPolicy(myCorsName,
     policy =>
     {
         policy
-        .WithOrigins("http://localhost:3000")
+        .AllowAnyOrigin()
+        // .WithOrigins("http://192.168.1.143:3000", "http://localhost:3000")
         .WithHeaders("Authorization", "Content-Type")
         .WithMethods("PUT", "DELETE");
     }));

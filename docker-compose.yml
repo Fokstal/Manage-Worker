@@ -11,6 +11,8 @@ services:
       - api
     networks:
       - app-network
+    environment:
+      - REACT_APP_IP=http://192.168.1.143:5177
 
   api:
     container_name: api
