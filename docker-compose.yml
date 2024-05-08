@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  client:
+    container_name: client
+    build: 
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_IP=http://192.168.1.143:5177
+
+  api:
+    container_name: api
+    build: 
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - 5177:8080
+    volumes:
+      - type: volume
+        source: avatar_volume
+        target: /app/wwwroot/images/avatars
+      - type: volume
+        source: db_volume
+        target: /app/Appdata
+    networks:
+      - app-network
+
+volumes:
+  avatar_volume:
+  db_volume:
+
+networks:
+  app-network:
+    driver: bridge
